@@ -39,6 +39,7 @@ release: git-status build
 	mkdir -p release/$(COMMIT)
 	@for o in $(GOOS); do \
 	  for a in $(GOARCH); do \
+	    cp -R scripts ./build/$(COMMIT)/$${o}/$${a} ; \
         tar -C ./build/$(COMMIT)/$${o}/$${a} -czvf release/$(COMMIT)/fileshaper_$(COMMIT)_$${o}_$${a}.tar.gz . ; \
 	  done \
     done ; \
@@ -81,5 +82,10 @@ git-status: ## require status is clean so we can use undo_edits to put things ba
 		echo "Error - working directory is dirty. Commit those changes!"; \
 		exit 1; \
 	fi
+
+shellcheck: ## use black to format python files
+	( \
+       git ls-files '*.sh' |  xargs shellcheck --format=gcc; \
+    )
 
 .PHONY: build release static upload vet lint fmt gocyclo goimports test
