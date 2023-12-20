@@ -108,3 +108,37 @@ func TestDuplicateSet_String(t *testing.T) {
 		})
 	}
 }
+
+func TestDuplicateSet_SortByLineNumberCount(t *testing.T) {
+	type fields struct {
+		Lines []DuplicateLineNumbers
+	}
+	tests := []struct {
+		name   string
+		fields fields
+	}{
+		{"empty",
+			fields{[]DuplicateLineNumbers{}},
+		},
+		{"a,b",
+			fields{[]DuplicateLineNumbers{
+				{Line: "a", LineNumbers: []int{0}},
+				{Line: "b", LineNumbers: []int{1}},
+			}},
+		},
+		{"a,b,b",
+			fields{[]DuplicateLineNumbers{
+				{Line: "a", LineNumbers: []int{0}},
+				{Line: "b", LineNumbers: []int{1, 2}},
+			}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ds := &DuplicateSet{
+				Lines: tt.fields.Lines,
+			}
+			ds.SortByLineNumberCount()
+		})
+	}
+}

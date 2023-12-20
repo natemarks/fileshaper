@@ -3,19 +3,24 @@ package internal
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
+// DuplicateLineNumbers contains the line and the line numbers where it appears.
 type DuplicateLineNumbers struct {
 	Line        string
 	LineNumbers []int
 }
+
+// DuplicateSet contains the lines and their line numbers.
 type DuplicateSet struct {
 	Lines []DuplicateLineNumbers
 }
 
-func (d *DuplicateSet) Contains(line string) bool {
-	for _, l := range d.Lines {
+// Contains returns true if the DuplicateSet contains the given line.
+func (ds *DuplicateSet) Contains(line string) bool {
+	for _, l := range ds.Lines {
 		if l.Line == line {
 			return true
 		}
@@ -23,9 +28,17 @@ func (d *DuplicateSet) Contains(line string) bool {
 	return false
 }
 
-func (d *DuplicateSet) String() string {
+// SortByLineNumberCount sorts the Lines in DuplicateSet based on the count of LineNumbers
+func (ds *DuplicateSet) SortByLineNumberCount() {
+	sort.Slice(ds.Lines, func(i, j int) bool {
+		return len(ds.Lines[i].LineNumbers) > len(ds.Lines[j].LineNumbers)
+	})
+}
+
+// String returns a string representation of the DuplicateSet.
+func (ds *DuplicateSet) String() string {
 	var result []string
-	for _, l := range d.Lines {
+	for _, l := range ds.Lines {
 		result = append(result, l.Line+": "+fmt.Sprint(l.LineNumbers))
 	}
 	return strings.Join(result, "\n")

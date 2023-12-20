@@ -1,27 +1,37 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"github.com/natemarks/fileshaper/internal"
 	"os"
+
+	"github.com/natemarks/fileshaper/internal"
 )
 
-func getInput() string {
-	// Check if any arguments are provided
-	if len(os.Args) < 2 {
-		panic("Please provide a filename")
+func processArgs() (string, bool) {
+	// Define flags
+	sortFlag := flag.Bool("sort", false, "Sort lines by appearance count")
+	flag.Parse()
+
+	// Get the first positional argument
+	if flag.NArg() == 0 {
+		fmt.Println("Usage: <your_program> [file_path] [-sort]")
+		flag.Usage()
+		os.Exit(1)
 	}
 
-	return os.Args[1] // Return the first positional argument
+	return flag.Arg(0), *sortFlag
 }
-func main {
-	filename := getInput()
+func main() {
+	filename, sort := processArgs()
 	lines, err := internal.Lines(filename)
 	if err != nil {
 		panic(err)
 	}
-	duplicates, err := internal.Duplicates(lines)
-	for line, lineNumbers := range duplicates {
-		fmt.Printf("%s: %v\n", line, lineNumbers)
+
+	result := internal.Duplicates(lines)
+	if sort {
+		result.SortByLineNumberCount()
 	}
+	fmt.Println(result)
 }
